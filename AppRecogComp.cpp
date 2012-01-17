@@ -319,7 +319,7 @@ RTC::ReturnCode_t AppRecog::onExecute(RTC::UniqueId ec_id)
     	    index++;
     	  }
       }
-    for(int i = 0;i< seq.size() ; i++)
+    for(int i = 0; i< (int)seq.size() ; i++)
       {
 	std::cout << seq[i] << std::endl;
       }
