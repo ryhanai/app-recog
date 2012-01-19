@@ -31,20 +31,37 @@ STUB_OBJ = VisionStub.o ImgStub.o
 IMPL_OBJ = #ImgSVC_impl.o VisionSVC_impl.o
 OBJS     = AppRecogConsumer.o $(SKEL_OBJ) $(STUB_OBJ) $(IMPL_OBJ)
 
+TARGET   = AppRecogConsumer
+TARGETCOMP = $(BINDIR)/$(TARGET)Comp
+BINDIR = ./build/bin
+OBJDIR = ./build/obj
+LIBDIR = ./build/lib
+
 .SUFFIXES : .so
 
-all: AppRecogConsumer.so AppRecogConsumerComp
+
+
+all: mkdir $(TARGETCOMP) AppRecogConsumer.so
 
 
 .cpp.o:
 	rm -f $@
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
+mkdir:
+	@if [ ! -d $(BINDIR) ]; then \
+	echo "Make build directory";\
+	mkdir -p $(BINDIR);\
+	mkdir -p $(OBJDIR);\
+	mkdir -p $(LIBDIR);\
+	fi
+
+
 .o.so:
 	rm -f $@
 	$(CXX) $(SHFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
-AppRecogConsumerComp: AppRecogConsumerComp.o $(OBJS)
+$(TARGETCOMP): $(OBJDIR)/$(TARGET)Comp.o $(OBJS)
 	$(CXX) -o $@ $(OBJS) AppRecogConsumerComp.o $(LDFLAGS) 
 
 
@@ -52,7 +69,7 @@ clean: clean_objs
 	rm -f *~
 
 clean_objs:
-	rm -f $(OBJS) AppRecogConsumerComp.o AppRecogConsumer.so AppRecogConsumerComp
+	rm -f $(OBJS) $(OBJDIR)/$(TARGET)Comp.o $(TARGETLIB) $(TARGETCOMP)
 
 VisionStub.cpp : Vision.idl 
 	$(IDLC) $(IDLFLAGS) Vision.idl 
@@ -62,8 +79,8 @@ VisionStub.h : Vision.idl
 	$(WRAPPER) $(WRAPPER_FLAGS) --idl-file=Vision.idl 
 
 AppRecogConsumer.so: $(OBJS)
-AppRecogConsumer.o: AppRecogConsumer.h VisionStub.h  
-AppRecogConsumerComp.o: AppRecogConsumerComp.cpp AppRecogConsumer.cpp AppRecogConsumer.h  
+$(OBJDIR)/$(TARGET).o: AppRecogConsumer.h VisionStub.h  
+$(OBJDIR)/$(TARGET)Comp.o: AppRecogConsumerComp.cpp AppRecogConsumer.cpp AppRecogConsumer.h  
 
 
 VisionSkel.o: VisionSkel.cpp VisionSkel.h VisionStub.h

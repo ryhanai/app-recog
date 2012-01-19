@@ -14,6 +14,7 @@ WRAPPER_FLAGS = --include-dir="" --skel-suffix=Skel --stub-suffix=Stub
 LSFX = so
 
 TARGET   = AppRecog
+TARGETSERVICE   = AppRecog
 BINDIR = ./build/bin
 OBJDIR = ./build/obj
 LIBDIR = ./build/lib
@@ -52,7 +53,9 @@ $(TARGETLIB): $(OBJS)
 	$(CXX) $(SHFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
 $(TARGETCOMP): $(OBJDIR)/$(TARGET)Comp.o $(OBJS)
-	$(CXX) -o $@ $(OBJDIR)/$(TARGET)Comp.o $(OBJS) $(LDFLAGS) 
+	$(CXX) -o $@ $(OBJDIR)/$(TARGET)Comp.o $(OBJS) $(LDFLAGS)
+
+$(OBJDIR)/$(TARGETSERVICE)Comp.o: AppRecogConsumerComp.cpp AppRecogConsumer.cpp AppRecogConsumer.h  
 
 clean: clean_objs
 	rm -f *~
@@ -65,12 +68,35 @@ dist-clean: clean_objs
 clean_objs:
 	rm -f $(OBJS) $(OBJDIR)/$(TARGET)Comp.o $(TARGETLIB) $(TARGETCOMP)
 
+# clean_skelstub:
+# 	rm -f *Skel.h *Skel.cpp
+# 	rm -f *Stub.h *Stub.cpp
+
 ImgSkel.cpp : Img.idl
 	$(IDLC) $(IDLFLAGS) -I/usr/include/rtm/idl Img.idl
 	$(WRAPPER) $(WRAPPER_FLAGS) --idl-file=Img.idl
 ImgSkel.h : Img.idl
 	$(IDLC) $(IDLFLAGS) -I/usr/include/rtm/idl Img.idl
 	$(WRAPPER) $(WRAPPER_FLAGS) --idl-file=Img.idl
+
+ImgStub.cpp : Img.idl 
+	$(IDLC) $(IDLFLAGS) Img.idl 
+	$(WRAPPER) $(WRAPPER_FLAGS) --idl-file=Img.idl 
+ImgStub.h : Img.idl 
+	$(IDLC) $(IDLFLAGS) Img.idl 
+	$(WRAPPER) $(WRAPPER_FLAGS) --idl-file=Img.idl 
+
+
+VisionSkel.o: VisionSkel.cpp VisionSkel.h VisionStub.h
+VisionStub.o: VisionStub.cpp VisionStub.h
+
+VisionStub.cpp : Vision.idl 
+	$(IDLC) $(IDLFLAGS) Vision.idl 
+	$(WRAPPER) $(WRAPPER_FLAGS) --idl-file=Vision.idl 
+VisionStub.h : Vision.idl 
+	$(IDLC) $(IDLFLAGS) Vision.idl 
+	$(WRAPPER) $(WRAPPER_FLAGS) --idl-file=Vision.idl 
+
 
 $(OBJDIR)/$(TARGET).o: $(TARGET).cpp $(TARGET).h ImgSkel.h ImgSVC_impl.h
 	rm -f $@
@@ -117,6 +143,10 @@ $(OBJDIR)/VisionSkel.o: VisionSkel.cpp VisionSkel.h VisionStub.h
 $(OBJDIR)/VisionStub.o: VisionStub.cpp VisionStub.h
 	rm -f $@
 	$(CXX) $(CXXFLAGS) $(EXTRAINCS) -c -o $@ $<
+
+
+AppRecogConsumer.so: $(OBJS)
+
 
 
 # end of Makefile
