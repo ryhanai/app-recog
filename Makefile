@@ -1,6 +1,6 @@
 CXXFLAGS = `rtm-config --cflags` -I.
 LDFLAGS  = `pkg-config --libs opencv`
-#LDFLAGS	= `rospack libs-only-l opencv2`
+LDFLAGS	= `rospack libs-only-l opencv2`
 LDFLAGS += `rtm-config --libs`
 SHFLAGS  = -shared
 
@@ -14,26 +14,26 @@ WRAPPER_FLAGS = --include-dir="" --skel-suffix=Skel --stub-suffix=Stub
 LSFX = so
 
 TARGET   = AppRecog
-TARGETSERVICE   = AppRecog
+TARGETSERVICE   = AppRecogConsumer
 BINDIR = ./build/bin
 OBJDIR = ./build/obj
 LIBDIR = ./build/lib
 SKEL_OBJ = ImgSkel.o VisionSkel.o
 STUB_OBJ = #VisionStub.o ImgStub.o
 IMPL_OBJ = ImgSVC_impl.o VisionSVC_impl.o
-OBJFILES = $(TARGET).o time.o simpsolib.o simtstlib.o Vision.o $(SKEL_OBJ) $(STUB_OBJ) $(IMPL_OBJ)
+OBJFILES = $(TARGET).o time.o simpsolib.o simtstlib.o Vision.o $(SKEL_OBJ) $(STUB_OBJ) $(IMPL_OBJ) $(TARGETSERVICE).o
 OBJS     = $(addprefix $(OBJDIR)/, $(OBJFILES))
 #TARGETLIB = $(LIBDIR)/$(TARGET).$(LSFX)
 TARGETCOMP = $(BINDIR)/$(TARGET)Comp
 #CXXFLAGS += -march=native
 CXXFLAGS += -msse2 -funroll-loops -O3 -Wall # -mssse3
-CXXFLAGS += `pkg-config --cflags opencv`
-#CXXFLAGS += `pkg-config --cflags opencv-2.3.1`
+#CXXFLAGS += `pkg-config --cflags opencv`
+CXXFLAGS += `pkg-config --cflags opencv-2.3.1`
 LDFLAGS += -lboost_regex
 #LDFLAGS += `pkg-config --libs opencv` -L /usr/lib/ -ljpeg
 
 
-all: mkdir $(TARGETLIB) $(BINDIR)/$(TARGET)Comp $(BINDIR)/rtc.conf $(BINDIR)/$(TARGET)
+all: mkdir $(TARGETLIB) $(BINDIR)/$(TARGET)Comp $(BINDIR)/$(TARGETSERVICE)Comp $(BINDIR)/rtc.conf $(BINDIR)/$(TARGET) 
 
 .cpp.o:
 
@@ -55,7 +55,8 @@ $(TARGETLIB): $(OBJS)
 $(TARGETCOMP): $(OBJDIR)/$(TARGET)Comp.o $(OBJS)
 	$(CXX) -o $@ $(OBJDIR)/$(TARGET)Comp.o $(OBJS) $(LDFLAGS)
 
-$(OBJDIR)/$(TARGETSERVICE)Comp.o: AppRecogConsumerComp.cpp AppRecogConsumer.cpp AppRecogConsumer.h  
+$(BINDIR)/$(TARGETSERVICE)Comp: $(OBJDIR)/$(TARGETSERVICE)Comp.o $(OBJS)
+	$(CXX) -o $@ $(OBJDIR)/$(TARGETSERVICE)Comp.o $(OBJS) $(LDFLAGS)
 
 clean: clean_objs
 	rm -f *~
@@ -105,6 +106,15 @@ $(OBJDIR)/$(TARGET).o: $(TARGET).cpp $(TARGET).h ImgSkel.h ImgSVC_impl.h
 $(OBJDIR)/$(TARGET)Comp.o: $(TARGET)Comp.cpp ImgSkel.h ImgSVC_impl.h
 	rm -f $@
 	$(CXX) $(CXXFLAGS) $(EXTRAINCS) -c -o $@ $<
+
+$(OBJDIR)/$(TARGETSERVICE)Comp.o: $(TARGETSERVICE)Comp.cpp ImgSkel.h ImgSVC_impl.h
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(EXTRAINCS) -c -o $@ $<
+
+$(OBJDIR)/$(TARGETSERVICE).o: $(TARGETSERVICE).cpp ImgSkel.h ImgSVC_impl.h
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(EXTRAINCS) -c -o $@ $<
+
 
 $(OBJDIR)/$(TARGET)_main.o: $(TARGET)_main.cpp
 	$(CXX) $(CXXFLAGS) $(EXTRAINCS) -c -o $@ $<
