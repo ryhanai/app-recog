@@ -13,7 +13,9 @@
 #include <rtm/CorbaPort.h>
 #include <rtm/DataInPort.h>
 #include <rtm/DataOutPort.h>
-
+#include "Vision.h"
+#include "Vision.hh"
+#include "AppRecogComp.h"
 // Service implementation headers
 // <rtc-template block="service_impl_h">
 
@@ -59,7 +61,7 @@ class AppRecogConsumer  : public RTC::DataFlowComponentBase
 
   // The execution action that is invoked periodically
   // former rtc_active_do()
-  // virtual RTC::ReturnCode_t onExecute(RTC::UniqueId ec_id);
+  virtual RTC::ReturnCode_t onExecute(RTC::UniqueId ec_id);
 
   // The aborting action when main logic error occurred.
   // former rtc_aborting_entry()
