@@ -319,10 +319,10 @@ RTC::ReturnCode_t AppRecog::onExecute(RTC::UniqueId ec_id)
     	    index++;
     	  }
       }
-    for(int i = 0; i< (int)seq.size() ; i++)
-      {
-	std::cout << seq[i] << std::endl;
-      }
+    // for(int i = 0; i< (int)seq.size() ; i++)
+    //   {
+    // 	std::cout << seq[i] << std::endl;
+    //   }
     struct timeval tv;
     gettimeofday(&tv, NULL);
     // RecognitionResult.tm.sec = tv.tv_sec;

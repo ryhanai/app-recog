@@ -380,6 +380,9 @@ void estimatePose(State st, Model model, cv::Mat cameraMat, cv::Mat distCoeffs, 
       temp.x = vertices[i].get<0>();
       temp.y = vertices[i].get<1>();
       temp.z = vertices[i].get<2>();
+
+      temp.y *= -1;
+
       objectPoints.push_back(temp);
     }
   cv::Mat OP(objectPoints);
