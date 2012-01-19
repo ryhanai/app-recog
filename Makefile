@@ -1,6 +1,6 @@
 CXXFLAGS = `rtm-config --cflags` -I.
 LDFLAGS  = `pkg-config --libs opencv`
-LDFLAGS	= `rospack libs-only-l opencv2`
+#LDFLAGS	= `rospack libs-only-l opencv2`
 LDFLAGS += `rtm-config --libs`
 SHFLAGS  = -shared
 
@@ -27,8 +27,8 @@ OBJS     = $(addprefix $(OBJDIR)/, $(OBJFILES))
 TARGETCOMP = $(BINDIR)/$(TARGET)Comp
 #CXXFLAGS += -march=native
 CXXFLAGS += -msse2 -funroll-loops -O3 -Wall # -mssse3
-#CXXFLAGS += `pkg-config --cflags opencv`
-CXXFLAGS += `pkg-config --cflags opencv-2.3.1`
+CXXFLAGS += `pkg-config --cflags opencv`
+#CXXFLAGS += `pkg-config --cflags opencv-2.3.1`
 LDFLAGS += -lboost_regex
 #LDFLAGS += `pkg-config --libs opencv` -L /usr/lib/ -ljpeg
 
