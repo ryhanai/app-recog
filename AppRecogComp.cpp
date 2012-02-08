@@ -38,10 +38,10 @@ void MyModuleInit(RTC::Manager* manager)
 AppRecog::AppRecog(RTC::Manager* manager)
   // <rtc-template block="initializer">
   : RTC::DataFlowComponentBase(manager),
-    m_originalTImageIn("originalImage", m_originalTImage),
-    m_outTImageOut("resultImage", m_outTImage),
-    m_RecognitionServicePort("Vision"),
-    TimedRecognitionResultOut("TimedRecognitionResultOut", RecogResult)
+    m_originalTImageIn("InputImage", m_originalTImage),
+    m_outTImageOut("ResultImage", m_outTImage),
+    m_RecognitionServicePort("Recognition"),
+    TimedRecognitionResultOut("RecognitionResult", RecogResult)
 
     // </rtc-template>
 {
@@ -88,11 +88,11 @@ RTC::ReturnCode_t AppRecog::onInitialize()
   // Registration: InPort/OutPort/Service
   // <rtc-template block="registration">
   // Set InPort buffers
-  addInPort("originalImage", m_originalTImageIn);
+  addInPort("InputImage", m_originalTImageIn);
 
   // Set OutPort buffer
-  addOutPort("resultImage", m_outTImageOut);
-  addOutPort("TimedRecognitionResultOut", TimedRecognitionResultOut);
+  addOutPort("ResultImage", m_outTImageOut);
+  addOutPort("RecognitionResult", TimedRecognitionResultOut);
 
   // Set service provider to Ports
   m_RecognitionServicePort.registerProvider("recogservice0", "RecognitionService", m_recogservice0);
