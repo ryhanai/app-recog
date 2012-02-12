@@ -252,10 +252,16 @@ class AppRecog
   cv::Mat m_cameraMat;
   cv::Mat m_distCoeffs;
   std::string m_window_name;
-  int m_debug_level;
-
   std::string modelFile;
-  int adaptiveThresholdPram;
+  int m_adaptive_threshold_param;
+  double m_detection_threshold;
+  double m_x_lbound;
+  double m_x_ubound;
+  double m_y_lbound;
+  double m_y_ubound;
+  double m_scale_lbound;
+  double m_scale_ubound;
+  int m_debug_level;    
 
   // </rtc-template>
 
