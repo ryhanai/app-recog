@@ -74,6 +74,14 @@ static const char* apprecog_spec[] =
     "conf.default.window_name", "Recognition result",
     "conf.default.calib_file", "camera_calib.yml",
     "conf.default.model_file", "parts.yml",
+    "conf.default.adaptive_threshold_param", "5",
+    "conf.default.detection_threshold", "90.0",
+    "conf.default.x_lbound", "80.0",
+    "conf.default.x_ubound", "560.0",
+    "conf.default.y_lbound", "60.0",
+    "conf.default.y_ubound", "420.0",
+    "conf.default.scale_lbound", "2.75",
+    "conf.default.scale_ubound", "3.00",
     "conf.default.debug_level", "0",
     // Widget
     // Constraints
@@ -109,7 +117,16 @@ RTC::ReturnCode_t AppRecog::onInitialize()
   bindParameter("window_name", m_window_name, "Recognition result");
   bindParameter("calib_file", m_calib_file, "camera_calib.yml");
   bindParameter("model_file", modelFile, "parts.yml");
+  bindParameter("adaptive_threshold_param", m_adaptive_threshold_param, "5");
+  bindParameter("detection_threshold", m_detection_threshold, "90.0");
+  bindParameter("x_lbound", m_x_lbound, "80.0");
+  bindParameter("x_ubound", m_x_ubound, "560.0");
+  bindParameter("y_lbound", m_y_lbound, "60.0");
+  bindParameter("y_ubound", m_y_ubound, "420.0");
+  bindParameter("scale_lbound", m_scale_lbound, "2.75");
+  bindParameter("scale_ubound", m_scale_ubound, "3.00");
   bindParameter("debug_level", m_debug_level, "0");
+
 
   // </rtc-template>
   return RTC::RTC_OK;
@@ -302,7 +319,11 @@ RTC::ReturnCode_t AppRecog::onExecute(RTC::UniqueId ec_id)
     ar.setCameraMat(m_cameraMat);
     ar.setDistCoeffs(m_distCoeffs);
     ar.setEdgeExtraction("adaptive threshold");
-    ar.recognize (srcimg, dstimg, rotation, translation, m_debug_level>=1);
+    ar.recognize (srcimg, dstimg, rotation, translation,
+    		  m_detection_threshold,
+    		  m_x_lbound, m_x_ubound, m_y_lbound, m_y_ubound,
+    		  m_scale_lbound, m_scale_ubound,
+    		  m_debug_level>=1);
     cv::Vec3d v_transform(translation);
 
     vector<double> seq;

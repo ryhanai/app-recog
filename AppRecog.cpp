@@ -129,6 +129,10 @@ std::string AppearanceRecognition::ID2ModelName(int ModelID)
 
 bool AppearanceRecognition::recognize (Mat& observation, Mat& output,
 				       Mat& rotation, Mat& translation,
+				       double detect_threshold,
+				       double xlbound, double xubound,
+				       double ylbound, double yubound,
+				       double slbound, double subound,
 				       bool debug)
 {
     Mat hsvimg;
@@ -185,10 +189,11 @@ bool AppearanceRecognition::recognize (Mat& observation, Mat& output,
     extern unsigned long current_utime();
     unsigned long start = current_utime();
 
-    double detect_threshold = 90.0;
     //double confidence = optimize_bruteforce(stmax, debug, detect_threshold);
 
-    double confidence = optimize_pso(stmax, false, detect_threshold);
+    double confidence = optimize_pso(stmax, false, detect_threshold,
+				     xlbound, xubound, ylbound, yubound,
+				     slbound, subound);
     Mat temp;
     estimatePose(stmax, model_, cameraMat_, distCoeffs_, temp, translation);
 
@@ -477,28 +482,30 @@ double optimize_pso_main(vector<double>& lower_range, vector<double>& upper_rang
     return value;
 }
 
-double optimize_pso(State& st, bool debug, double thresh=85.0) {
+double optimize_pso(State& st, bool debug, double thresh,
+		    double xlbound, double xubound, double ylbound, double yubound,
+		    double slbound, double subound) {
     int nvars = 4;
 
     vector<double> lower_range(nvars);
     vector<double> upper_range(nvars);
-    lower_range[0] = 180.0;
-    upper_range[0] = 460.0;
-    lower_range[1] = 100.0;
-    upper_range[1] = 380.0;
+    // lower_range[0] = 180.0;
+    // upper_range[0] = 460.0;
+    // lower_range[1] = 100.0;
+    // upper_range[1] = 380.0;
     lower_range[2] = 0.0;
     upper_range[2] = PI;
-    lower_range[3] = 2.75;
-    upper_range[3] = 3.00;
+    lower_range[3] = slbound;
+    upper_range[3] = subound;
     double value;
 
     // value = optimize_pso_main(lower_range, upper_range, st, debug);
     // if (value > threh) { return value; }
 
-    lower_range[0] = 80.0;
-    upper_range[0] = 560.0;
-    lower_range[1] = 60.0;
-    upper_range[1] = 420.0;
+    lower_range[0] = xlbound;
+    upper_range[0] = xubound;
+    lower_range[1] = ylbound;
+    upper_range[1] = yubound;
     value = optimize_pso_main(lower_range, upper_range, st, debug);
     if (value > thresh) { return value; }
 
