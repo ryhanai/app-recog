@@ -106,11 +106,17 @@ public:
 
   bool recognize (cv::Mat& observation, cv::Mat& output,
 		  cv::Mat& rotation, cv::Mat& translation,
+		  double detection_threshold,
+		  double xlbound, double xubound,
+		  double ylbound, double yubound,
+		  double slbound, double subound,
 		  bool debug);
 
 };
 
-double optimize_pso(State& st, bool debug, double thresh);
+double optimize_pso(State& st, bool debug, double thresh, 
+		    double xlbound, double xubound, double ylbound, double yubound,
+		    double slbound, double subound);
 
 void estimatePose(State st, Model model, cv::Mat cameraMat, cv::Mat distCoeffs,
 		  cv::Mat &rotate, cv::Mat &transform);
