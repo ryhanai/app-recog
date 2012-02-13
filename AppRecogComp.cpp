@@ -319,74 +319,72 @@ RTC::ReturnCode_t AppRecog::onExecute(RTC::UniqueId ec_id)
     ar.setCameraMat(m_cameraMat);
     ar.setDistCoeffs(m_distCoeffs);
     ar.setEdgeExtraction("adaptive threshold");
-    ar.recognize (srcimg, dstimg, rotation, translation,
-    		  m_detection_threshold,
-    		  m_x_lbound, m_x_ubound, m_y_lbound, m_y_ubound,
-    		  m_scale_lbound, m_scale_ubound,
-    		  m_debug_level>=1);
-    cv::Vec3d v_transform(translation);
+    
+    if (ar.recognize (srcimg, dstimg, rotation, translation,
+		      m_detection_threshold,
+		      m_x_lbound, m_x_ubound, m_y_lbound, m_y_ubound,
+		      m_scale_lbound, m_scale_ubound,
+		      m_debug_level>=1)) {
+      cv::Vec3d v_transform(translation);
 
-    vector<double> seq;
-    int index = 0;
-    for(int i = 0; i < 9; i++){
-      seq.push_back(0);
-    }
-
-    for(int i = 0; i < rotation.rows ; i++)
-      {
-    	for(int j = 0; j < rotation.cols; j++)
-    	  {
-    	    seq[index] = rotation.at<double>(i,j);
-    	    index++;
-    	  }
+      vector<double> seq;
+      int index = 0;
+      for(int i = 0; i < 9; i++){
+	seq.push_back(0);
       }
-    // for(int i = 0; i< (int)seq.size() ; i++)
-    //   {
-    // 	std::cout << seq[i] << std::endl;
-    //   }
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    RecogResult.tm.sec = tv.tv_sec;
-    RecogResult.tm.nsec = tv.tv_usec*1000;
-    RecogResult.data.length(20);
-    for(int i = 0; i < 20 ;i++)
-      RecogResult.data[i] = 0;
-    RecogResult.data[8] = seq[0];
-    RecogResult.data[9] = seq[1];
-    RecogResult.data[10] = seq[2];
-    RecogResult.data[11] = v_transform[0];
-    RecogResult.data[12] = seq[3];
-    RecogResult.data[13] = seq[4];
-    RecogResult.data[14] = seq[5];
-    RecogResult.data[15] = v_transform[1];
-    RecogResult.data[16] = seq[6];
-    RecogResult.data[17] = seq[7];
-    RecogResult.data[18] = seq[8];
-    RecogResult.data[19] = v_transform[2];
+
+      for(int i = 0; i < rotation.rows ; i++)
+	{
+	  for(int j = 0; j < rotation.cols; j++)
+	    {
+	      seq[index] = rotation.at<double>(i,j);
+	      index++;
+	    }
+	}
+      struct timeval tv;
+      gettimeofday(&tv, NULL);
+      RecogResult.tm.sec = tv.tv_sec;
+      RecogResult.tm.nsec = tv.tv_usec*1000;
+      RecogResult.data.length(20);
+      for(int i = 0; i < 20 ;i++)
+	RecogResult.data[i] = 0;
+      RecogResult.data[8] = seq[0];
+      RecogResult.data[9] = seq[1];
+      RecogResult.data[10] = seq[2];
+      RecogResult.data[11] = v_transform[0];
+      RecogResult.data[12] = seq[3];
+      RecogResult.data[13] = seq[4];
+      RecogResult.data[14] = seq[5];
+      RecogResult.data[15] = v_transform[1];
+      RecogResult.data[16] = seq[6];
+      RecogResult.data[17] = seq[7];
+      RecogResult.data[18] = seq[8];
+      RecogResult.data[19] = v_transform[2];
 
 
-    IplImage temp = dstimg;
-    m_outImageBuff = &temp;
+      IplImage temp = dstimg;
+      m_outImageBuff = &temp;
 
-    //TimedCameraImage
+      //TimedCameraImage
 
-    m_outTImage.data.image.format = Img::CF_RGB;
-    m_outTImage.data.image.width = m_outImageBuff->width;
-    m_outTImage.data.image.height = m_outImageBuff->height;
-    const int t_num = m_outImageBuff->width * m_outImageBuff->height * m_outImageBuff->nChannels;
-    m_outTImage.data.image.raw_data.length(t_num);
-    c = 0;
-    for (int y = 0; y < m_outImageBuff->height; y++){
-      for (int x = 0; x < m_outImageBuff->width; x++){
-	for (int d = 0; d < m_outImageBuff->nChannels; d++, c++){
-	  const int off = y * m_outImageBuff->widthStep + x * m_outImageBuff->nChannels + (m_outImageBuff->nChannels - d - 1);
-	  m_outTImage.data.image.raw_data[c] = (uchar) m_outImageBuff->imageData[off];
+      m_outTImage.data.image.format = Img::CF_RGB;
+      m_outTImage.data.image.width = m_outImageBuff->width;
+      m_outTImage.data.image.height = m_outImageBuff->height;
+      const int t_num = m_outImageBuff->width * m_outImageBuff->height * m_outImageBuff->nChannels;
+      m_outTImage.data.image.raw_data.length(t_num);
+      c = 0;
+      for (int y = 0; y < m_outImageBuff->height; y++){
+	for (int x = 0; x < m_outImageBuff->width; x++){
+	  for (int d = 0; d < m_outImageBuff->nChannels; d++, c++){
+	    const int off = y * m_outImageBuff->widthStep + x * m_outImageBuff->nChannels + (m_outImageBuff->nChannels - d - 1);
+	    m_outTImage.data.image.raw_data[c] = (uchar) m_outImageBuff->imageData[off];
+	  }
 	}
       }
-    }
 
-    m_outTImageOut.write();
-    TimedRecognitionResultOut.write();
+      m_outTImageOut.write();
+      TimedRecognitionResultOut.write();
+    }
 
     imshow(m_window_name, dstimg);
     waitKey(10);
