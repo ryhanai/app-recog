@@ -346,8 +346,8 @@ RTC::ReturnCode_t AppRecog::onExecute(RTC::UniqueId ec_id)
     //   }
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    // RecognitionResult.tm.sec = tv.tv_sec;
-    // RecognitionResult.tm.nsec = tv.tv_usec*1000;
+    RecogResult.tm.sec = tv.tv_sec;
+    RecogResult.tm.nsec = tv.tv_usec*1000;
     RecogResult.data.length(20);
     for(int i = 0; i < 20 ;i++)
       RecogResult.data[i] = 0;
