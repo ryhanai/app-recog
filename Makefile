@@ -62,9 +62,11 @@ clean: clean_objs
 	rm -f *~
 	rm -f *.lo
 	rm -f *.la
+	rm -rf ./build/
 
 dist-clean: clean_objs
 	rm -rf ./build/
+	(cd doc && make clean)
 
 clean_objs:
 	rm -f $(OBJS) $(OBJDIR)/$(TARGET)Comp.o $(TARGETLIB) $(TARGETCOMP)
