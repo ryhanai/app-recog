@@ -148,7 +148,7 @@ https://code.google.com/p/app-recog/
 
   http://www-arailab.sys.es.osaka-u.ac.jp/CameraIF/
 
-  \subsection{接続}
+  \subsection{カメラを用いた認識}
 
   実際にカメラモジュールと接続し，オンラインでテストを行います．
   このときのモジュール接続は\figref{fig:test_by_camera}のようになり，
@@ -175,12 +175,24 @@ https://code.google.com/p/app-recog/
   また，背景に模様がなく，対象物と異なる色のものを置くと認識しやすくなり
   ます．
 
-  テストとして，カメラモジュールをLoadPictureCompモジュールに差し替え，
-  あらかじめ撮っておいた画像を用いてテストを行う場合，
-  CaptureCameraCompをLoadPictureCompに置き換えた接続となります．
-  ログ画像の指定は，LoadPictureCompモジュールのLoadPicture.confで
-  行う．AppRecogモジュール付属の画像data/parts4.jpgを用いて確認してくだ
-  さい．
+  \begin{figure}[tbh]
+   \begin{center}
+    \includegraphics[width=0.8\linewidth]{figure/recog_test_cam.png}
+    \caption{USBカメラを用いた場合の接続図}
+    \label{fig:test_by_camera}
+   \end{center}
+  \end{figure}
+
+
+  \subsection{ログ画像を用いた認識}
+
+  カメラモジュールをLoadPictureCompモジュールに差し替えることで，
+  あらかじめ撮っておいた画像を用いてテストを行うことができます．
+  RTCの接続は，CaptureCameraCompをLoadPictureCompに置き換えたものとなります．
+  ログ画像の指定は，LoadPictureCompモジュールのLoadPicture.confで行いま
+  す．まず，AppRecogモジュール付属の画像data/parts4.jpgをLoadPictureComp
+  のディレクトリにコピーし，以下のようにLoadPictureCompが読み込むように
+  設定してください．
 
   LoadPicture.confで読み込む画像を指定するには，rtc.confに
 \begin{verbatim}
@@ -190,18 +202,39 @@ Processing Module.LoadPicture.config_file: LoadPicture.conf
 \begin{verbatim}
 conf.default.string_file_name: parts4.jpg
 \end{verbatim}
-と記述します．parts4.jpgは読込みたいファイルの名前を書きます．
+を記述します．parts4.jpgは読込みたいファイルの名前を書きます．
 正しく動作していれば，\figref{fig:apprecog}（左）のようなウィンドウが表
 示されます．
 
-\begin{figure}[tb]
- \begin{center}
-  \includegraphics[width=0.8\linewidth]{figure/recog_test_cam.png}
-  \caption{USBカメラを用いたテスト}
-  \label{fig:test_by_camera}
- \end{center}
-\end{figure}
+次に，サービスを利用して認識対象の切り替えを行います．
+一度，実行しているコンポーネントを終了させた後，以下の設定を行なってくだ
+さい．
 
+\begin{enumerate}
+ \item LoadPicture.confで読み込む画像を，piece\_red.jpgにする \\
+       （画像は上と同様にLoadPictureCompディレクトリにコピーしておきま
+       す）．
+ \item AppRecogにおける検出閾値を下げます．AppRecong.confで
+       \begin{verbatim}
+	conf.default.detection_threshold: 80.0
+       \end{verbatim}
+       とします．
+\end{enumerate}
+ここまで設定をした後，LoadPictureCompとAppRecogCompを起動，ポートの接
+続，activateを行います．この状態で，partsを認識する設定になっています．
+次に，サービスで認識対象を変更するため，付属のテスト用クライアントを起動
+し，RTCの接続，activateを行った後，クライアントで認識対象の変更を行います．
+\begin{lstlisting}
+ $ build/bin/AppRecogComp
+ 別端末で
+ $ rtcon AppRecog0.rtc:Recognition AppRecogConsumer0.rtc:RecognitionService 
+ $ rtact AppRecogConsumer0.rtc
+
+ Command list:
+  getModelID        : get current model ID.
+  setModelID [value]: set model ID.
+ > setModelID 2
+\end{lstlisting}
 
 % \addcontentsline{toc}{chapter}{参考文献}
 % \markboth{参考文献}{参考文献}
