@@ -133,7 +133,7 @@ bool AppearanceRecognition::recognize (Mat& observation, Mat& output,
 				       double xlbound, double xubound,
 				       double ylbound, double yubound,
 				       double slbound, double subound,
-				       bool debug)
+				       int debug_level)
 {
     Mat hsvimg;
     cvtColor(observation, hsvimg, CV_BGR2HSV);
@@ -189,7 +189,7 @@ bool AppearanceRecognition::recognize (Mat& observation, Mat& output,
     extern unsigned long current_utime();
     unsigned long start = current_utime();
 
-    //double confidence = optimize_bruteforce(stmax, debug, detect_threshold);
+    //double confidence = optimize_bruteforce(stmax, debug_level>=1, detect_threshold);
 
     double confidence = optimize_pso(stmax, false, detect_threshold,
 				     xlbound, xubound, ylbound, yubound,
@@ -211,7 +211,7 @@ bool AppearanceRecognition::recognize (Mat& observation, Mat& output,
       draw_result(dtf_norm, stmax, model_);
     }
 
-    if (debug) {
+    if (debug_level >= 1) {
       imshow("intensity edge", iedge);
       imshow("distance transform", dtf_norm);
     }
