@@ -158,9 +158,13 @@ RTC::ReturnCode_t AppRecog::onActivated(RTC::UniqueId ec_id)
 {
   m_imageBuff = NULL;
   m_outImageBuff = NULL;
+  m_cameraMat = Mat::zeros(3,3,CV_32FC1);
 
-  std::cout << "calib_file: " << m_calib_file << std::endl;
   std::cout << "model_file_name: " << modelFile << std::endl;
+  ar.loadObjFile(modelFile);
+
+#ifdef LOAD_CALIB_DATA
+  std::cout << "calib_file: " << m_calib_file << std::endl;
 
   int width,height;
   cv::FileStorage cvfs(m_calib_file, cv::FileStorage::READ);
@@ -172,6 +176,7 @@ RTC::ReturnCode_t AppRecog::onActivated(RTC::UniqueId ec_id)
       std::cerr << "Could not open camera parameter." << std::endl;
       return RTC::RTC_ERROR;
     }
+
 #if CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION >= 2
   cvfs["image_width"] >> width;
   cvfs["image_height"] >> height;
@@ -185,9 +190,10 @@ RTC::ReturnCode_t AppRecog::onActivated(RTC::UniqueId ec_id)
   cv::read(fn, m_cameraMat);
   fn = node["distortion_coefficients"];
   cv::read(fn, m_distCoeffs);
-#endif  // CV_MAJOR_VE
+#endif
 
-  ar.loadObjFile(modelFile);
+#endif
+
 
   // (4)print loaded data
   // cout << "width:" << width << endl;
@@ -280,12 +286,12 @@ RTC::ReturnCode_t AppRecog::onExecute(RTC::UniqueId ec_id)
 	      = m_originalTImage.data.intrinsic.matrix_element[i];
 	  }
 
-	m_cameraMat = Mat::zeros(3,3,CV_32FC1);
 	m_cameraMat.at<float>(0,0) = m_originalTImage.data.intrinsic.matrix_element[0];
 	m_cameraMat.at<float>(0,1) = m_originalTImage.data.intrinsic.matrix_element[1];
 	m_cameraMat.at<float>(1,1) = m_originalTImage.data.intrinsic.matrix_element[2];
  	m_cameraMat.at<float>(0,2) = m_originalTImage.data.intrinsic.matrix_element[3];
 	m_cameraMat.at<float>(1,2) = m_originalTImage.data.intrinsic.matrix_element[4];
+
       }
 
     int dist_size = m_originalTImage.data.intrinsic.distortion_coefficient.length();
@@ -324,7 +330,7 @@ RTC::ReturnCode_t AppRecog::onExecute(RTC::UniqueId ec_id)
 		      m_detection_threshold,
 		      m_x_lbound, m_x_ubound, m_y_lbound, m_y_ubound,
 		      m_scale_lbound, m_scale_ubound,
-		      m_debug_level>=1)) {
+		      m_debug_level)) {
       cv::Vec3d v_transform(translation);
 
       vector<double> seq;

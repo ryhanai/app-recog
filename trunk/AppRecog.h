@@ -110,7 +110,7 @@ public:
 		  double xlbound, double xubound,
 		  double ylbound, double yubound,
 		  double slbound, double subound,
-		  bool debug);
+		  int debug_level);
 
 };
 
