@@ -1,0 +1,1 @@
+This is an RT-component that offers a function of 2D edge-based object recognition.
